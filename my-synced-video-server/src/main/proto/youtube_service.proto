@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package services;
+
+option java_package = "io.github.ayoubinoss.mysyncedvideo.services";
+option java_multiple_files = true;
+
+service YoutubeService {
+  rpc Login (LoginReq) returns (LoginRes);
+  rpc Stream (stream StreamReq) returns (stream StreamRes);
+}
+
+message LoginReq {
+  string user_name = 1;
+  string room_id = 2;
+}
+
+message LoginRes {
+  string token = 1;
+}
+
+message StreamReq {
+  Event event = 1;
+}
+
+
+message StreamRes {
+  Event event = 1;
+}
+
+enum Event {
+  UNKNOWN = 0;
+  PLAY = 1;
+  PAUSE = 2;
+}
