@@ -3,6 +3,8 @@ package io.github.ayoubinoss.mysyncedvideo.util;
 import io.github.ayoubinoss.mysyncedvideo.MySyncedVideoException;
 import io.github.ayoubinoss.mysyncedvideo.model.Room;
 import io.github.ayoubinoss.mysyncedvideo.model.User;
+import io.github.ayoubinoss.mysyncedvideo.services.LoginRes;
+import io.grpc.stub.StreamObserver;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -61,8 +63,11 @@ public class RoomsManager {
    * @param room room to join
    * @param user user to add
    */
-  public void addUser(Room room, User user) {
-    rooms.get(room).addLast(user);
+  public void addUser(Room room, User user) throws MySyncedVideoException {
+    if(isUserNameValid(room, user))
+      rooms.get(room).addLast(user);
+    else
+      throw new MySyncedVideoException("This handle is taken by another user, choose another one");
   }
 
   /**
@@ -86,5 +91,21 @@ public class RoomsManager {
         if (u.getName().equals(user.getName()))
           return false;
     return true;
+  }
+
+  /**
+   * login function
+   * @param room the room to create/join
+   * @param user the user
+   * @throws MySyncedVideoException exception
+   */
+  public void login(Room room, User user, StreamObserver<LoginRes> responseObserver)
+      throws MySyncedVideoException {
+    if(!isRoomExist(room))
+      addRoom(room, user);
+    else
+      addUser(room, user);
+    responseObserver.onNext(LoginRes.newBuilder().setToken("success").build());
+    responseObserver.onCompleted();
   }
 }
