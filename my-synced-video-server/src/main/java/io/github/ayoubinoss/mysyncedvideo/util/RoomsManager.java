@@ -1,5 +1,6 @@
 package io.github.ayoubinoss.mysyncedvideo.util;
 
+import io.github.ayoubinoss.mysyncedvideo.MySyncedVideoException;
 import io.github.ayoubinoss.mysyncedvideo.model.Room;
 import io.github.ayoubinoss.mysyncedvideo.model.User;
 import java.util.HashMap;
@@ -45,10 +46,13 @@ public class RoomsManager {
    * @param room room to create
    * @param user user who create the room
    */
-  public void addRoom(Room room, User user) {
+  public void addRoom(Room room, User user) throws MySyncedVideoException {
     if(!isRoomExist(room)) {
       rooms.put(room, new LinkedList<User>());
       addUser(room, user);
+    }
+    else {
+      throw new MySyncedVideoException("the room name is already in use. pick another one");
     }
   }
 
@@ -77,11 +81,10 @@ public class RoomsManager {
    * @return either the user handle is valid or not
    */
   public boolean isUserNameValid(Room room, User user) {
-    if(!rooms.containsKey(room))
-      rooms.put(room, new LinkedList<>());
-    for (User u : rooms.get(room))
-      if (u.getName().equals(user.getName()))
-        return false;
+    if(rooms.get(room) != null)
+      for (User u : rooms.get(room))
+        if (u.getName().equals(user.getName()))
+          return false;
     return true;
   }
 }
